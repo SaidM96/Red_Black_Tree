@@ -1,17 +1,17 @@
-#include <iostream>
-#include <cmath>
-
+#include "RedBlackTree.hpp"
 
 int main()
 {
-    float a = 13.35;
-    float b = 2.88;
+    RBT tree;
 
-    int fixeda = (int)roundf((1 << 8) * a);
-    int fixedb = (int)roundf((1 << 8) * b);
+    tree.InsertNode(5);
+    tree.InsertNode(10);
+    tree.InsertNode(3);
 
-    float result = fixeda + fixedb;
-    result = ((float)result / (1 << 8));
-    std::cout << result << std::endl;
-    std::cout << a + b << std::endl;
+    if (tree.Search(10))
+        std::cout << "10 is found\n";
+    if (tree.Search(5))
+        std::cout << "5 is found\n";
+    if (tree.Search(7))
+        std::cout << "7 is found\n";
 }

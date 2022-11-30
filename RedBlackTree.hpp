@@ -6,10 +6,11 @@
 /*   By: smia <smia@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/26 17:14:48 by smia              #+#    #+#             */
-/*   Updated: 2022/11/30 17:57:56 by smia             ###   ########.fr       */
+/*   Updated: 2022/11/30 18:58:48 by smia             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#pragma once
 #include <iostream>
 
 enum Color{
@@ -34,7 +35,7 @@ class RBT
     private:
         node* root;
         node* tail;
-        int size;
+        int   size;
     public:
         RBT() : size(0)
         {
@@ -47,8 +48,7 @@ class RBT
         }
         ~RBT()
         {
-            //clear_tree 
-            
+            //clear_tree
             delete tail;
         }
          
@@ -194,13 +194,13 @@ class RBT
 
         // Insertion new Node as binary search tree insertion , and coloring it red
         // Recolor and Rotation
-        node* InsertNode(int data)
+        void InsertNode(int data)
         {
-            node* Node = new node(NULL, tail, tail,RED);
+            node* Node = new node(tail, tail, tail,RED);
             Node->_data = data;
             
             node* pos = root; // pos start with root and go till we find position that we will insert new Node in
-            node* hold; // hold parent of pos (node that we will insert in)
+            node* hold = tail; // hold parent of pos (node that we will insert in)
             while( pos != tail)
             {
                 hold = pos;
@@ -215,26 +215,26 @@ class RBT
                 else
                 {
                     delete Node;
-                    return root;
+                    return ;
                 }
             }
             Node->_parent = hold; // new Node with his parent;
             this->size++;
             // link node in tree with new Node 
-            if (hold == NULL) // it means tree is empty so we will insert new Node as root (black) , and there no need to fix anything
+            if (hold == tail) // it means tree is empty so we will insert new Node as root (black) , and there no need to fix anything
             {
                 Node->_color = BLACK; 
                 root = Node;
-                return root;
+                return ;
             }
             else if (Node->_data >= hold->_data)
                 hold->_right = Node;
             else
                 hold->_left = Node;
             // if granparent is null or color of parent is black , so de don't have to do nothing 
-            if (Node->_parent->_parent == NULL || Node->_parent->_color == BLACK)
+            if (Node->_parent->_parent == tail || Node->_parent->_color == BLACK)
             {
-                return Node;
+                return ;
             }
             // we need to fix tree
             Fixtree(Node);
