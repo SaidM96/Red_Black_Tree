@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   RedBlackTree.cpp                                   :+:      :+:    :+:   */
+/*   RedBlackTree.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: smia <smia@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/26 17:14:48 by smia              #+#    #+#             */
-/*   Updated: 2022/11/30 18:58:48 by smia             ###   ########.fr       */
+/*   Updated: 2022/12/03 15:40:55 by smia             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,18 @@ class node
         node*   _right;  // right childe 
         node*   _left; // left childe
         // constructer
-        node(node* parent, node* right, node* left, Color color) : _parent(parent), _right(right), _left(left), _color(color) { _data = 0;}
+        node()
+        {
+            
+        }
+        node(node* parent, node* right, node* left, Color color, int data) : _parent(parent), _right(right), _left(left), _color(color) 
+        { 
+            _data = data;   
+        }
+        // ~node()
+        // {
+        //     delete 
+        // }
 };
 
 
@@ -34,51 +45,47 @@ class RBT
 {
     private:
         node* root;
-        node* tail;
+        node* NIL;
         int   size;
     public:
         RBT() : size(0)
         {
-            tail = new node(NULL, NULL, NULL, BLACK);
-            tail->_color = BLACK;
-            tail->_data = 0;
-            tail->_right = NULL;
-            tail->_right = NULL;
-            root = tail;
+            NIL = new node(NULL, NULL, NULL, BLACK, 0);
+            root = NIL;
         }
         ~RBT()
         {
             //clear_tree
-            delete tail;
+            delete NIL;
         }
          
         node* get_root(void) const
         {
             return this->root;
         }
-        node* get_tail(void) const { return this->tail;}
+        node* get_NIL(void) const { return this->NIL;}
         int get_size(void) const { return this->size;}
         
-        node* get_grandpa(node* Node)
+        node* get_grandpa(node* Node) const
         {
-            if (Node != this->tail && Node->_parent != this->tail && Node->_parent->_parent != this->tail)
+            if (Node != this->NIL && Node->_parent != this->NIL && Node->_parent->_parent != this->NIL)
                 return (Node->_parent->_parent);    
-            return (this->tail);
+            return (this->NIL);
         }
         // to know if Node is a left child of his parent or not 
-        bool is_leftChild(node* Node)
+        bool is_leftChild(node* Node) const
         {
-            if (Node == tail || Node->_parent == tail || Node->_parent->_left == tail)
+            if (Node == NIL || Node->_parent == NIL || Node->_parent->_left == NIL)
                 return false;
             if (Node == Node->_parent->_left)
                 return true;
             return false;
         }
         
-        node* get_sibling_node(node* Node)
+        node* get_sibling_node(node* Node) const
         {
-            if (Node == tail || Node->_parent == tail || Node->_parent->_left == tail || Node->_parent->_right == tail)
-                return tail;
+            if (Node == NIL || Node->_parent == NIL || Node->_parent->_left == NIL || Node->_parent->_right == NIL)
+                return NIL;
             bool side = is_leftChild(Node);
             if (side)
                 return (Node->_parent->_right);
@@ -86,10 +93,10 @@ class RBT
                 return (Node->_parent->_left);
         }
         
-        node* get_uncle(node* Node)
+        node* get_uncle(node* Node) const
         {
-            if (Node == tail || Node->_parent == tail)
-                return tail;
+            if (Node == NIL || Node->_parent == NIL)
+                return NIL;
             return (get_sibling_node(Node->_parent));
         }
         
@@ -100,10 +107,10 @@ class RBT
             node* ptr = Node->_right; // save right child of our Node
             
             Node->_right = ptr->_left; // move left childe of ptr to (right child of Node)
-            if (ptr->_left != tail)
+            if (ptr->_left != NIL)
                 ptr->_left->_parent = Node;
             ptr->_parent = Node->_parent;
-            if (Node->_parent == tail)
+            if (Node->_parent == NIL)
                 this->root = ptr;
             else
             {
@@ -120,10 +127,10 @@ class RBT
         {
             node* ptr = Node->_left; //  save left child of our Node
             Node->_left =  ptr->_right;
-            if (ptr->_right != tail)
+            if (ptr->_right != NIL)
                 ptr->_right->_parent = Node;
             ptr->_parent = Node->_parent;
-            if (Node->_parent == tail)
+            if (Node->_parent == NIL)
                 this->root = ptr;
             else
             {
@@ -196,12 +203,10 @@ class RBT
         // Recolor and Rotation
         void InsertNode(int data)
         {
-            node* Node = new node(tail, tail, tail,RED);
-            Node->_data = data;
-            
+            node* Node = new node(NIL, NIL, NIL,RED, data);
             node* pos = root; // pos start with root and go till we find position that we will insert new Node in
-            node* hold = tail; // hold parent of pos (node that we will insert in)
-            while( pos != tail)
+            node* hold = NIL; // hold parent of pos (node that we will insert in)
+            while( pos != NIL)
             {
                 hold = pos;
                 if (Node->_data > pos->_data)
@@ -221,7 +226,7 @@ class RBT
             Node->_parent = hold; // new Node with his parent;
             this->size++;
             // link node in tree with new Node 
-            if (hold == tail) // it means tree is empty so we will insert new Node as root (black) , and there no need to fix anything
+            if (hold == NIL) // it means tree is empty so we will insert new Node as root (black) , and there no need to fix anything
             {
                 Node->_color = BLACK; 
                 root = Node;
@@ -232,7 +237,7 @@ class RBT
             else
                 hold->_left = Node;
             // if granparent is null or color of parent is black , so de don't have to do nothing 
-            if (Node->_parent->_parent == tail || Node->_parent->_color == BLACK)
+            if (Node->_parent->_parent == NIL || Node->_parent->_color == BLACK)
             {
                 return ;
             }
@@ -240,10 +245,10 @@ class RBT
             Fixtree(Node);
         }
 
-        bool Search(int data)  // we can also return a pointer to node in tree if data was found , else return tail 
+        bool Search(int data)  // we can also return a pointer to node in tree if data was found , else return NIL 
         {
             node* ptr = this->root;
-            while (ptr == tail)
+            while (ptr != NIL)
             {
                 if (data == ptr->_data)
                     return true;  // data is found i tree
@@ -254,5 +259,24 @@ class RBT
             }
             return false; // data is not found in tree;
         }
+
+        void print_tree(node* root)
+        {
+            node* tmp = root;
+            if (root != NIL)
+                std::cout << root->_data <<  " color : " << root->_color << std::endl;
+            if (root->_left != NIL)
+                print_tree(root->_left);
+            if (root->_right != NIL)
+                print_tree(root->_right);
+        }
+         // Delete
+        void delete_node(int data)
+        {
+            
+        }
+        
+        // min , max    
+
         
 };
