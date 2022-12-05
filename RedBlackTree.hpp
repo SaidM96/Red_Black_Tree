@@ -6,7 +6,7 @@
 /*   By: smia <smia@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/26 17:14:48 by smia              #+#    #+#             */
-/*   Updated: 2022/12/05 19:05:40 by smia             ###   ########.fr       */
+/*   Updated: 2022/12/05 20:02:56 by smia             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -254,10 +254,12 @@ class RBT
                 {
                     return ptr;  // data is found i tree
                 }
-                else if (data > ptr->_data)
+                if (data > ptr->_data && ptr->_right)
                     ptr = ptr->_right;
-                else
+                else if (data < ptr->_data && ptr->_left)
                     ptr = ptr->_left;
+                else
+                    return ptr;
             }
             return NIL; // data is not found in tree;
         }
@@ -279,11 +281,12 @@ class RBT
 
         node* inorder_successor(node* Node)// the smalest from the right subtree of Node 
         {
-            if (Node == NIL)
+            if (Node == NIL || Node->_left == NIL)
                 return Node;
-            Node = Node->_right;
-            while(Node != NIL)
+            while(Node != NIL && Node->_left != NIL)
+            {
                 Node = Node->_left;
+            }
             return Node;
         }
         
