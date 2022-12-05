@@ -6,7 +6,7 @@
 /*   By: smia <smia@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/26 17:14:48 by smia              #+#    #+#             */
-/*   Updated: 2022/12/03 15:40:55 by smia             ###   ########.fr       */
+/*   Updated: 2022/12/05 19:05:40 by smia             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,10 +34,8 @@ class node
         { 
             _data = data;   
         }
-        // ~node()
-        // {
-        //     delete 
-        // }
+
+
 };
 
 
@@ -56,7 +54,9 @@ class RBT
         ~RBT()
         {
             //clear_tree
-            delete NIL;
+            // if (root != NIL)
+            //     delete root;
+            // delete NIL;
         }
          
         node* get_root(void) const
@@ -245,24 +245,30 @@ class RBT
             Fixtree(Node);
         }
 
-        bool Search(int data)  // we can also return a pointer to node in tree if data was found , else return NIL 
+        node* Search(int data)  // we can also return a pointer to node in tree if data was found , else return NIL 
         {
             node* ptr = this->root;
             while (ptr != NIL)
             {
                 if (data == ptr->_data)
-                    return true;  // data is found i tree
+                {
+                    return ptr;  // data is found i tree
+                }
                 else if (data > ptr->_data)
                     ptr = ptr->_right;
                 else
                     ptr = ptr->_left;
             }
-            return false; // data is not found in tree;
+            return NIL; // data is not found in tree;
         }
 
         void print_tree(node* root)
         {
-            node* tmp = root;
+            if (root == NIL)
+            {
+                std::cout << "tree is empty \n";
+                return ;
+            }
             if (root != NIL)
                 std::cout << root->_data <<  " color : " << root->_color << std::endl;
             if (root->_left != NIL)
@@ -270,13 +276,104 @@ class RBT
             if (root->_right != NIL)
                 print_tree(root->_right);
         }
-         // Delete
-        void delete_node(int data)
+
+        node* inorder_successor(node* Node)// the smalest from the right subtree of Node 
         {
-            
+            if (Node == NIL)
+                return Node;
+            Node = Node->_right;
+            while(Node != NIL)
+                Node = Node->_left;
+            return Node;
         }
         
-        // min , max    
-
+        node* inorder_predecessor(node* Node) // the largest element in left subtree of Node
+        {
+            if (Node == NIL || Node->_right == NIL)
+                return Node;
+            while(Node != NIL && Node->_right != NIL)
+            {
+                Node = Node->_right;
+            }
+            return Node;
+        }
+         //
+        void delete_node(int data)
+        {
+            node* Node = Search(data);
+            _delete_node(Node);
+        }
         
+        void _delete_node(node* Node)
+        {
+            if (Node == this->root)
+            {
+                if (root->_right != NIL)
+                {
+                    node* tmp = inorder_successor(root->_right);
+                    root->_data = tmp->_data;
+                    _delete_node(tmp);
+                    return ;
+                }
+                if (root->_left != NIL)
+                {
+                    node* tmp = inorder_predecessor(root->_left);
+                    root->_data = tmp->_data;
+                    _delete_node(tmp);
+                    return ;
+                }
+                if (root != NIL)
+                    root = NIL;
+                return ;
+            }
+            node* ptr = this->root;
+            while (ptr != NIL)
+            {
+                if (Node->_data == ptr->_data)
+                {
+                    break ;  // now we need to delete ptr
+                }
+                else if (Node->_data > ptr->_data)
+                    ptr = ptr->_right;
+                else
+                    ptr = ptr->_left;
+            }
+            if (ptr == NIL) //  no Node was found in tree with Key : data
+                return ;
+            if (ptr->_left == NIL && ptr->_right == NIL) // no children 
+            {
+                if (is_leftChild(ptr))
+                    ptr->_parent->_left = NIL;
+                else
+                    ptr->_parent->_right = NIL;
+                delete ptr;
+            }
+            
+            else if (ptr->_right != NIL && ptr->_left == NIL) // one child left . link parent Node with the child then delete the Node 
+            {
+                if(is_leftChild(ptr))
+                    ptr->_parent->_left = ptr->_right;
+                else
+                    ptr->_parent->_right = ptr->_right;
+                ptr->_right->_parent = ptr->_parent;
+                delete ptr;
+            }
+            else if (ptr->_right == NIL && ptr->_left != NIL) // one child right
+            {
+                if(is_leftChild(ptr))
+                    ptr->_parent->_left = ptr->_left;
+                else
+                    ptr->_parent->_right = ptr->_left;
+                ptr->_left->_parent = ptr->_parent;
+                delete ptr;
+            }
+            else // two children
+            {
+                node* hold = ptr;
+                node* tmp = inorder_predecessor(ptr->_left);
+                ptr->_data = tmp->_data;
+                _delete_node(tmp);
+            }
+        }
+
 };
