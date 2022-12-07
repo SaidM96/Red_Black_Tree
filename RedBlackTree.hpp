@@ -6,7 +6,7 @@
 /*   By: smia <smia@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/26 17:14:48 by smia              #+#    #+#             */
-/*   Updated: 2022/12/05 20:02:56 by smia             ###   ########.fr       */
+/*   Updated: 2022/12/07 02:54:36 by smia             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -266,13 +266,19 @@ class RBT
 
         void print_tree(node* root)
         {
+
             if (root == NIL)
             {
                 std::cout << "tree is empty \n";
                 return ;
             }
             if (root != NIL)
-                std::cout << root->_data <<  " color : " << root->_color << std::endl;
+            {
+                if (root == this->root)
+                    std::cout << root->_data << "color  : " << root->_color <<" this is root\n";
+                else
+                    std::cout << root->_data <<  " color : " << root->_color << std::endl;
+            }
             if (root->_left != NIL)
                 print_tree(root->_left);
             if (root->_right != NIL)
@@ -304,28 +310,39 @@ class RBT
         void delete_node(int data)
         {
             node* Node = Search(data);
-            _delete_node(Node);
+            if (Node != NIL)
+            {
+                this->size--;   
+                _delete_node(Node);
+            }
         }
         
         void _delete_node(node* Node)
         {
+            int hold_data;
+            Color hold_color;
+            
             if (Node == this->root)
             {
-                if (root->_right != NIL)
+                if (root->_right != NIL)// cases : root have a right child or 2 child
                 {
                     node* tmp = inorder_successor(root->_right);
-                    root->_data = tmp->_data;
+                    hold_data = tmp->_data;
+                    hold_color = tmp->_color;
                     _delete_node(tmp);
+                    root->_data = hold_data;
                     return ;
                 }
-                if (root->_left != NIL)
+                if (root->_left != NIL) // case: left child;
                 {
                     node* tmp = inorder_predecessor(root->_left);
-                    root->_data = tmp->_data;
+                    hold_data = tmp->_data;
+                    hold_color = tmp->_color;
                     _delete_node(tmp);
+                    root->_data = hold_data;
                     return ;
-                }
-                if (root != NIL)
+                } 
+                if (root != NIL) // case: no child
                     root = NIL;
                 return ;
             }
@@ -351,10 +368,8 @@ class RBT
                     ptr->_parent->_right = NIL;
                 delete ptr;
             }
-            
             else if (ptr->_right != NIL && ptr->_left == NIL) // one child left . link parent Node with the child then delete the Node 
-            {
-                if(is_leftChild(ptr))
+            {                if(is_leftChild(ptr))
                     ptr->_parent->_left = ptr->_right;
                 else
                     ptr->_parent->_right = ptr->_right;
@@ -372,10 +387,11 @@ class RBT
             }
             else // two children
             {
-                node* hold = ptr;
                 node* tmp = inorder_predecessor(ptr->_left);
-                ptr->_data = tmp->_data;
+                hold_data = tmp->_data;
+                hold_color = tmp->_color;
                 _delete_node(tmp);
+                ptr->_data = hold_data;
             }
         }
 
