@@ -6,7 +6,7 @@
 /*   By: smia <smia@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/26 17:14:48 by smia              #+#    #+#             */
-/*   Updated: 2022/12/07 02:54:36 by smia             ###   ########.fr       */
+/*   Updated: 2022/12/07 03:40:32 by smia             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -346,20 +346,20 @@ class RBT
                     root = NIL;
                 return ;
             }
-            node* ptr = this->root;
-            while (ptr != NIL)
-            {
-                if (Node->_data == ptr->_data)
-                {
-                    break ;  // now we need to delete ptr
-                }
-                else if (Node->_data > ptr->_data)
-                    ptr = ptr->_right;
-                else
-                    ptr = ptr->_left;
-            }
-            if (ptr == NIL) //  no Node was found in tree with Key : data
-                return ;
+            node* ptr = Node;
+            // while (ptr != NIL)
+            // {
+            //     if (Node->_data == ptr->_data)
+            //     {
+            //         break ;  // now we need to delete ptr
+            //     }
+            //     else if (Node->_data > ptr->_data)
+            //         ptr = ptr->_right;
+            //     else
+            //         ptr = ptr->_left;
+            // }
+            // if (ptr == NIL) //  no Node was found in tree with Key : data
+            //     return ;
             if (ptr->_left == NIL && ptr->_right == NIL) // no children 
             {
                 if (is_leftChild(ptr))
